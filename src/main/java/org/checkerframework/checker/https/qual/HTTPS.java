@@ -1,4 +1,4 @@
-package qual;
+package org.checkerframework.checker.https.qual;
 
 import org.checkerframework.framework.qual.DefaultFor;
 import org.checkerframework.framework.qual.SubtypeOf;
