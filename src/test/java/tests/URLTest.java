@@ -29,7 +29,8 @@ public class URLTest extends CheckerFrameworkPerDirectoryTest {
                 "url",
                 "-Anomsgtext",
                 "-Astubs=stubs/",
-                "-nowarn");
+                "-nowarn",
+                "-AprintErrorStack");
     }
 
     @Parameters

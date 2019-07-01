@@ -23,7 +23,7 @@ public class HTTPSAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     @Override
     protected void addComputedTypeAnnotations(Tree tree, AnnotatedTypeMirror type, boolean iUseFlow) {
         this.setStringToHTTPS(tree, type);
-        super.addComputedTypeAnnotations(tree, type);
+        super.addComputedTypeAnnotations(tree, type, iUseFlow);
     }
 
     @Override
