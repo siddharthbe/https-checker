@@ -28,9 +28,8 @@ public class URLTest extends CheckerFrameworkPerDirectoryTest {
                 org.checkerframework.checker.https.HTTPSChecker.class,
                 "url",
                 "-Anomsgtext",
-                "-Astubs=Stubs/",
-                "-nowarn",
-                "-AprintErrorStack");
+                "-Astubs=stubs/",
+                "-nowarn");
     }
 
     @Parameters

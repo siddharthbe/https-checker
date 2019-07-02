@@ -1,4 +1,5 @@
 package org.checkerframework.checker.https;
+
 import com.sun.source.tree.*;
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
@@ -12,13 +13,11 @@ import javax.lang.model.element.AnnotationMirror;
 import java.lang.annotation.Annotation;
 import java.util.Set;
 
-/** @checker_framework.manual #HTTPSChecker HTTPS Checker*/
 public class HTTPSAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 
     /** The @HTTPS annotation. */
     private final AnnotationMirror HTTPS;
 
-    /** Create a HTTPSAnnotatedTypeFactory. */
     public HTTPSAnnotatedTypeFactory(BaseTypeChecker checker){
         super(checker);
         this.HTTPS = AnnotationBuilder.fromClass(this.elements, HTTPS.class);
@@ -29,11 +28,6 @@ public class HTTPSAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     protected void addComputedTypeAnnotations(Tree tree, AnnotatedTypeMirror type, boolean iUserFlow) {
         this.setStringToHTTPS(tree, type);
         super.addComputedTypeAnnotations(tree, type, iUserFlow);
-    }
-
-    @Override
-    protected Set<Class<? extends Annotation>> createSupportedTypeQualifiers() {
-        return this.getBundledTypeQualifiersWithoutPolyAll();
     }
 
     /**
