@@ -9,6 +9,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * The string is known to begin with "https".
+ */
 
 @SubtypeOf({UnknownHTTPS.class})
 @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})
