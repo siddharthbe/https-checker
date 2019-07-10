@@ -16,5 +16,4 @@ import java.lang.annotation.Target;
 @SubtypeOf({UnknownHTTPS.class})
 @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@DefaultFor({TypeUseLocation.LOWER_BOUND})
 public @interface HTTPS {}
