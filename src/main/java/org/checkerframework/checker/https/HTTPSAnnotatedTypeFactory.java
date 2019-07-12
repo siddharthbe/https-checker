@@ -39,7 +39,7 @@ public class HTTPSAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
      * @param type: Type of the tree
      */
     private void setStringToHTTPS(Tree tree, AnnotatedTypeMirror type){
-        if(tree.getKind().equals(Tree.Kind.STRING_LITERAL)){
+        if(tree.getKind() == Tree.Kind.STRING_LITERAL){
             LiteralTree literalTree = (LiteralTree) tree;
             if(literalTree.getValue().toString().startsWith("https")){
                 QualifierDefaults defaults = new QualifierDefaults(this.elements, this);
@@ -49,11 +49,17 @@ public class HTTPSAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         }
     }
 
+    /**
+     * If tree is a binary tree of kind Concatenation and if the left operand has HTTPS annotation
+     * then the tree will have HTTPS annotation
+     * @param tree Given AST
+     * @param type Type of the tree
+     */
     private void checkConcatenatedString (Tree tree, AnnotatedTypeMirror type) {
-        if (tree.getKind().equals(Tree.Kind.PLUS)){
+        if (tree.getKind() == Tree.Kind.PLUS){
             BinaryTree binaryTree = (BinaryTree) tree;
-            if(AnnotationUtils.containsSameByClass(getAnnotatedType(binaryTree.getLeftOperand()).getAnnotations(),
-                                                    HTTPS.class)){
+            AnnotatedTypeMirror atm = getAnnotatedType(binaryTree.getLeftOperand());
+            if(AnnotationUtils.containsSameByClass(atm.getAnnotations(), HTTPS.class)){
                 QualifierDefaults defaults = new QualifierDefaults(this.elements, this);
                 defaults.addCheckedCodeDefault(this.HTTPS, TypeUseLocation.ALL);
                 defaults.annotate(tree, type);
