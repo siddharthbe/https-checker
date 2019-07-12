@@ -7,6 +7,7 @@ import org.checkerframework.framework.qual.TypeUseLocation;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.util.defaults.QualifierDefaults;
 import org.checkerframework.javacutil.AnnotationBuilder;
+import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.checker.https.qual.HTTPS;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -27,6 +28,7 @@ public class HTTPSAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     @Override
     protected void addComputedTypeAnnotations(Tree tree, AnnotatedTypeMirror type, boolean iUserFlow) {
         this.setStringToHTTPS(tree, type);
+        this.checkConcatenatedString(tree, type);
         super.addComputedTypeAnnotations(tree, type, iUserFlow);
     }
 
@@ -37,9 +39,27 @@ public class HTTPSAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
      * @param type: Type of the tree
      */
     private void setStringToHTTPS(Tree tree, AnnotatedTypeMirror type){
-        if(tree.getKind().equals(Tree.Kind.STRING_LITERAL)){
+        if(tree.getKind() == Tree.Kind.STRING_LITERAL){
             LiteralTree literalTree = (LiteralTree) tree;
             if(literalTree.getValue().toString().startsWith("https")){
+                QualifierDefaults defaults = new QualifierDefaults(this.elements, this);
+                defaults.addCheckedCodeDefault(this.HTTPS, TypeUseLocation.ALL);
+                defaults.annotate(tree, type);
+            }
+        }
+    }
+
+    /**
+     * If tree is a binary tree of kind Concatenation and if the left operand has HTTPS annotation
+     * then the tree will have HTTPS annotation
+     * @param tree Given AST
+     * @param type Type of the tree
+     */
+    private void checkConcatenatedString (Tree tree, AnnotatedTypeMirror type) {
+        if (tree.getKind() == Tree.Kind.PLUS){
+            BinaryTree binaryTree = (BinaryTree) tree;
+            AnnotatedTypeMirror atm = getAnnotatedType(binaryTree.getLeftOperand());
+            if(AnnotationUtils.containsSameByClass(atm.getAnnotations(), HTTPS.class)){
                 QualifierDefaults defaults = new QualifierDefaults(this.elements, this);
                 defaults.addCheckedCodeDefault(this.HTTPS, TypeUseLocation.ALL);
                 defaults.annotate(tree, type);
