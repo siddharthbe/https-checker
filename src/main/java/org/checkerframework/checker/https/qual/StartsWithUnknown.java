@@ -12,8 +12,6 @@ import java.lang.annotation.Target;
 /**
  * The string is not known to begin with "https".
  */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})
 @DefaultQualifierInHierarchy
 @SubtypeOf({})

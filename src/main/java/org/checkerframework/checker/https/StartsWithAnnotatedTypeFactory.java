@@ -47,6 +47,16 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         return new StartsWithQualifierHierarchy(factory);
     }
 
+    @Override
+    protected Set<Class<? extends Annotation>> createSupportedTypeQualifiers() {
+            return new LinkedHashSet<>(
+                Arrays.asList(
+                        StartsWith.class,
+                        StartsWithBottom.class,
+                        StartsWithUnknown.class,
+                        PolyStartsWith.class));
+    }
+
     public AnnotationMirror createStartsWith(Collection<String> exprs){
         AnnotationBuilder builder = new AnnotationBuilder(processingEnv, StartsWith.class);
         String[] exprArray = exprs.toArray(new String[0]);
@@ -64,15 +74,15 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         if(tree.getKind() == Tree.Kind.STRING_LITERAL){
             LiteralTree literalTree = (LiteralTree) tree;
             for(String s: this.ACCEPTED_STRINGS) {
+                System.out.println(literalTree.getValue().toString().startsWith(s));
                 if (literalTree.getValue().toString().startsWith(s)) {
                     QualifierDefaults defaults = new QualifierDefaults(this.elements, this);
-                    System.out.println(createStartsWith(this.ACCEPTED_STRINGS));
                     defaults.addCheckedCodeDefault(createStartsWith(this.ACCEPTED_STRINGS), TypeUseLocation.ALL);
                     defaults.annotate(tree, type);
-                    break;
                 }
             }
         }
+        System.out.println(type);
     }
 
     /**
@@ -167,7 +177,7 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                 return AnnotationUtils.areSameByClass(superAnno, PolyStartsWith.class);
             } else if (AnnotationUtils.hasElementValue(subAnno, "value")
                     && AnnotationUtils.hasElementValue(superAnno, "value")) {
-                List<String> subArrays = AnnotationUtils.getElementValueArray(subAnno, "value", String.class, true);;
+                List<String> subArrays = AnnotationUtils.getElementValueArray(subAnno, "value", String.class, true);
                 List<String> superArrays = AnnotationUtils.getElementValueArray(superAnno, "value", String.class, true);;
 
                 if (subArrays.containsAll(superArrays)) {
@@ -175,6 +185,11 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                 }
             }
             return false;
+        }
+
+        @Override
+        public AnnotationMirror getTopAnnotation(AnnotationMirror start) {
+            return UNKNOWN;
         }
     }
 }
