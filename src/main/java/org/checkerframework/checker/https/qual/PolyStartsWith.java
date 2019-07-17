@@ -6,4 +6,4 @@ import org.checkerframework.framework.qual.PolymorphicQualifier;
 
 @PolymorphicQualifier
 @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})
-public @interface PolyHTTPS {}
+public @interface PolyStartsWith{}
