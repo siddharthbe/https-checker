@@ -108,27 +108,16 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
             super(factory);
         }
 
-        private Set<String> unionIfNotDisjoint(Collection<String> c1, Collection<String> c2){
-            Set<String> result = new TreeSet<>(c1);
-            for(String s : c2) {
-                if(!result.add(s)) {
-                    return null;
-                }
-            }
-            return result;
-        }
-
         @Override
         public AnnotationMirror greatestLowerBound(AnnotationMirror a1, AnnotationMirror a2){
             if(AnnotationUtils.hasElementValue(a1, "value") && AnnotationUtils.hasElementValue(a2, "value")) {
                 List<String> a1Val = AnnotationUtils.getElementValueArray(a1, "value", String.class, true);
                 List<String> a2Val = AnnotationUtils.getElementValueArray(a2, "value", String.class, true);
-
-                Set<String> exprs = unionIfNotDisjoint(a1Val, a2Val);
-                if (exprs == null) {
+                if(Collections.disjoint(a1Val, a2Val)) {
                     return BOTTOM;
-                } else {
-                    return createStartsWith(exprs);
+                }else{
+                    a1Val.retainAll(a2Val);
+                    return createStartsWith(a1Val);
                 }
             }else{
                 if(AnnotationUtils.areSameByClass(a1, StartsWithUnknown.class)){
@@ -146,13 +135,11 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
             if (AnnotationUtils.hasElementValue(a1, "value") && AnnotationUtils.hasElementValue(a2, "value")) {
                 List<String> a1Val = AnnotationUtils.getElementValueArray(a1, "value", String.class, true);
                 List<String> a2Val = AnnotationUtils.getElementValueArray(a2, "value", String.class, true);
-
-                if (!Collections.disjoint(a1Val, a2Val)) {
-                    a1Val.retainAll(a2Val);
-                    return createStartsWith(a1Val);
-                } else {
-                    return UNKNOWN;
+                Set<String> result = new TreeSet<>(a1Val);
+                for(String s : a2Val) {
+                    result.add(s);
                 }
+                return createStartsWith(result);
             } else {
                 if (AnnotationUtils.areSameByClass(a1, StartsWithBottom.class)) {
                     return a2;
@@ -179,8 +166,7 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                     && AnnotationUtils.hasElementValue(superAnno, "value")) {
                 List<String> subArrays = AnnotationUtils.getElementValueArray(subAnno, "value", String.class, true);
                 List<String> superArrays = AnnotationUtils.getElementValueArray(superAnno, "value", String.class, true);;
-
-                if (subArrays.containsAll(superArrays)) {
+                if (superArrays.containsAll(subArrays)) {
                     return true;
                 }
             }
