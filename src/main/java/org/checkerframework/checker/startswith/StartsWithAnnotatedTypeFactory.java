@@ -17,12 +17,14 @@ import javax.lang.model.element.AnnotationMirror;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
+// The StartsWith checker ensures that URL strings start with the given strings.
+
 public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 
-    /** The @HTTPS annotation. */
-
+    // The @StartsWithBottom annotation.
     private final AnnotationMirror BOTTOM;
 
+    // The @StartsWithUnknown annotation
     private final AnnotationMirror UNKNOWN;
 
     private final ArrayList<String> ACCEPTED_STRINGS;
@@ -57,6 +59,11 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                         PolyStartsWith.class));
     }
 
+    /**
+     * Creates a @StartsWith annotation whose values are the given strings in a list.
+     * @param exprs
+     * @return
+     */
     public AnnotationMirror createStartsWith(Collection<String> exprs){
         AnnotationBuilder builder = new AnnotationBuilder(processingEnv, StartsWith.class);
         String[] exprArray = exprs.toArray(new String[0]);
@@ -65,8 +72,8 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     }
 
     /**
-     * If tree is a literal tree of kind string literal and if the string starts with "https"
-     * then add the HTTPS annotation so that dataflow can refine it
+     * If tree is a literal tree of kind string literal and if the string starts with "https",
+     * "file" or "path" then add the StartsWith annotation so that dataflow can refine it
      * @param tree: Given AST
      * @param type: Type of the tree
      */
@@ -84,8 +91,8 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     }
 
     /**
-     * If tree is a binary tree of kind Concatenation and if the left operand has HTTPS annotation
-     * then the tree will have HTTPS annotation
+     * If tree is a binary tree of kind Concatenation and if the left operand has StartsWith annotation
+     * then the tree will have StartsWith annotation
      * @param tree Given AST
      * @param type Type of the tree
      */
@@ -101,11 +108,18 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         }
     }
 
+    /** The qualifier hierarchy for the StartsWith type system. StartsWithUnknown is the topmost type and is the default
+     * type. StartsWithBottom is the bottom most type in the heirarchy. Types like StartsWith({"a"}) and
+     * StartsWith({"b"}) are distinct and at the same level.
+      */
     private final class StartsWithQualifierHierarchy extends MultiGraphQualifierHierarchy{
         public StartsWithQualifierHierarchy(MultiGraphQualifierHierarchy.MultiGraphFactory factory){
             super(factory);
         }
 
+        /** The GLB of two StartsWith annotations is the intersection of the elements in the two arrays, or is the
+         * bottom if the two sets don't intersect.
+         */
         @Override
         public AnnotationMirror greatestLowerBound(AnnotationMirror a1, AnnotationMirror a2){
             if(AnnotationUtils.hasElementValue(a1, "value") && AnnotationUtils.hasElementValue(a2, "value")) {
@@ -128,6 +142,8 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
             }
         }
 
+        /** The LUB of two StartsWith annotations is the union of the elements in the two arrays.
+         */
         @Override
         public AnnotationMirror leastUpperBound(AnnotationMirror a1, AnnotationMirror a2) {
             if (AnnotationUtils.hasElementValue(a1, "value") && AnnotationUtils.hasElementValue(a2, "value")) {
