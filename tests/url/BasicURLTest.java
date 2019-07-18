@@ -1,11 +1,9 @@
 import java.net.URL;
 import java.net.MalformedURLException;
-import checkerframework.checker.https.qual.*;
 
 class BasicURLTest {
     void good() throws MalformedURLException {
-        @StartsWith({"https", "file", "path"}) String s = "https://www.google.com";
-        URL url = new URL(s);
+        URL url = new URL("https://www.google.com");
     }
 
     void bad() throws MalformedURLException {

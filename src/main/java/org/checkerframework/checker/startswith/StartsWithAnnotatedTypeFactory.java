@@ -37,8 +37,8 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 
     @Override
     protected void addComputedTypeAnnotations(Tree tree, AnnotatedTypeMirror type, boolean iUserFlow) {
-        this.setStringToHTTPS(tree, type);
-        //this.checkConcatenatedString(tree, type);
+        this.setStringToStartsWith(tree, type);
+        this.checkConcatenatedString(tree, type);
         super.addComputedTypeAnnotations(tree, type, iUserFlow);
     }
 
@@ -70,11 +70,10 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
      * @param tree: Given AST
      * @param type: Type of the tree
      */
-    private void setStringToHTTPS(Tree tree, AnnotatedTypeMirror type){
+    private void setStringToStartsWith(Tree tree, AnnotatedTypeMirror type){
         if(tree.getKind() == Tree.Kind.STRING_LITERAL){
             LiteralTree literalTree = (LiteralTree) tree;
             for(String s: this.ACCEPTED_STRINGS) {
-                System.out.println(literalTree.getValue().toString().startsWith(s));
                 if (literalTree.getValue().toString().startsWith(s)) {
                     QualifierDefaults defaults = new QualifierDefaults(this.elements, this);
                     defaults.addCheckedCodeDefault(createStartsWith(this.ACCEPTED_STRINGS), TypeUseLocation.ALL);
@@ -82,7 +81,6 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                 }
             }
         }
-        System.out.println(type);
     }
 
     /**
@@ -91,17 +89,17 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
      * @param tree Given AST
      * @param type Type of the tree
      */
-    /**private void checkConcatenatedString (Tree tree, AnnotatedTypeMirror type) {
+    private void checkConcatenatedString (Tree tree, AnnotatedTypeMirror type) {
         if (tree.getKind() == Tree.Kind.PLUS){
             BinaryTree binaryTree = (BinaryTree) tree;
             AnnotatedTypeMirror atm = getAnnotatedType(binaryTree.getLeftOperand());
-            if(AnnotationUtils.containsSameByClass(atm.getAnnotations(), HTTPS.class)){
+            if(AnnotationUtils.containsSameByClass(atm.getAnnotations(), StartsWith.class)){
                 QualifierDefaults defaults = new QualifierDefaults(this.elements, this);
-                defaults.addCheckedCodeDefault(this.STARTS_WITH, TypeUseLocation.ALL);
+                defaults.addCheckedCodeDefault(createStartsWith(this.ACCEPTED_STRINGS), TypeUseLocation.ALL);
                 defaults.annotate(tree, type);
             }
         }
-    }*/
+    }
 
     private final class StartsWithQualifierHierarchy extends MultiGraphQualifierHierarchy{
         public StartsWithQualifierHierarchy(MultiGraphQualifierHierarchy.MultiGraphFactory factory){

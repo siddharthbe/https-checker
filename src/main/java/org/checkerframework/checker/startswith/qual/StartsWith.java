@@ -8,6 +8,5 @@ import org.checkerframework.framework.qual.SubtypeOf;
 @SubtypeOf(StartsWithUnknown.class)
 @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})
 public @interface StartsWith {
-    @JavaExpression
     String[] value();
 }
