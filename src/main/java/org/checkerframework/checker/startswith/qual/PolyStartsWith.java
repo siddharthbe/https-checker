@@ -1,4 +1,4 @@
-package org.checkerframework.checker.https.qual;
+package org.checkerframework.checker.startswith.qual;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;

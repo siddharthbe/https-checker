@@ -1,7 +1,7 @@
 import java.net.URL;
 import java.net.MalformedURLException;
 
-import org.checkerframework.checker.https.qual.*;
+import org.checkerframework.checker.startswith.qual.*;
 
 class PolyTest {
 

@@ -25,7 +25,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class URLTest extends CheckerFrameworkPerDirectoryTest {
     public URLTest(List<File> testFiles) {
         super(testFiles,
-                org.checkerframework.checker.https.StartsWithChecker.class,
+                org.checkerframework.checker.startswith.StartsWithChecker.class,
                 "url",
                 "-Anomsgtext",
                 "-Astubs=stubs/",

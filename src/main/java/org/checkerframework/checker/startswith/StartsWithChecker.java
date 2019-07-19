@@ -1,4 +1,4 @@
-package org.checkerframework.checker.https;
+package org.checkerframework.checker.startswith;
 
 import org.checkerframework.common.basetype.BaseTypeChecker;
 

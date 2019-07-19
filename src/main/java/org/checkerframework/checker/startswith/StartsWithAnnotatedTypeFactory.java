@@ -1,4 +1,4 @@
-package org.checkerframework.checker.https;
+package org.checkerframework.checker.startswith;
 
 import com.sun.source.tree.*;
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
@@ -9,7 +9,7 @@ import org.checkerframework.framework.util.defaults.QualifierDefaults;
 import org.checkerframework.javacutil.AnnotationBuilder;
 import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.framework.type.QualifierHierarchy;
-import org.checkerframework.checker.https.qual.*;
+import org.checkerframework.checker.startswith.qual.*;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGraphFactory;
 
@@ -180,16 +180,18 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
             return false;
         }
 
+        /** Takes two lists of strings one being the subtype and the other being the supertype and returns
+         * true if every string in subtype starts with atleast one or more string in the supertype
+         */
         private boolean checkStartsWith(List<String> subArrays, List<String> superArrays){
             for (String s1: subArrays){
-                boolean temp = false;
+                boolean stringMatched = false;
                 for(String s2: superArrays){
                     if(s1.startsWith(s2)) {
-                        temp = true;
+                        stringMatched = true;
                     }
-
                 }
-                if (!temp){
+                if (!stringMatched){
                     return false;
                 }
             }
