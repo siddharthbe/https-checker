@@ -12,7 +12,7 @@ The checker has four qualifiers:
 ```java
 class URL{
    public URL(@StartsWith({"https", "file", "path"}) String spec);
-}```
+}
         
         `@StartsWith(String[] acceptedStrings)` annotation is the super type of `@StartsWithBottom` and the subtype of
         `@StartsWithUnknown`. `@StartsWith(a)` is a subtype of `@StartsWith(b)` if all strings in array `a` start with atleast
