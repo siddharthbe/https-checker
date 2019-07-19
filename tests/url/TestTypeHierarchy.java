@@ -3,7 +3,6 @@ import org.checkerframework.checker.startswith.qual.*;
 class TestTypeHierarchy{
     @StartsWith({"https", "path"}) String subtypingGood(@StartsWith({"https"}) String s1,
                                                          @StartsWith({"path"}) String s2, boolean condition ){
-        @StartsWith({"https", "path"}) String s3 = subtypingBad(s1, s2, condition);
         if(condition){
             return s1;
         }else{
