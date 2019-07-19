@@ -8,11 +8,13 @@ The checker has four qualifiers:
         An expression with this type represents a string that starts with the same substring as at least one string from
         `acceptedStrings`. The annotation takes an array of accepted strings as an argument to type check against.
         For example, to enforce that all URLs start with "https", "file", and "path":
-            ```java
-            class URL{
-                public URL(@StartsWith({"https", "file", "path"}) String spec);
-            }
-            ```
+        
+```java
+class URL{
+   public URL(@StartsWith({"https", "file", "path"}) String spec);
+}
+```
+        
         `@StartsWith(String[] acceptedStrings)` annotation is the super type of `@StartsWithBottom` and the subtype of
         `@StartsWithUnknown`. `@StartsWith(a)` is a subtype of `@StartsWith(b)` if all strings in array `a` start with atleast
         one string from array `b`.
