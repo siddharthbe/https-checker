@@ -1,17 +1,16 @@
 import java.net.URL;
 import java.net.MalformedURLException;
 
-import org.checkerframework.checker.https.qual.HTTPS;
-import org.checkerframework.checker.https.qual.PolyHTTPS;
+import org.checkerframework.checker.startswith.qual.*;
 
 class PolyTest {
 
-    @PolyHTTPS String testMethod(@PolyHTTPS String s){
+    @PolyStartsWith String testMethod(@PolyStartsWith String s){
         return s;
     }
 
-    void makesUrl(@HTTPS String s) {
-        @HTTPS String s1 = testMethod(s);
+    void makesUrl(@StartsWith({"https", "path"}) String s) {
+        @StartsWith({"https", "path"}) String s1 = testMethod(s);
     }
 
     void doesntMakeUrl(String s) {
@@ -20,6 +19,6 @@ class PolyTest {
 
     void testError(String s) {
         // :: error: assignment.type.incompatible
-        @HTTPS String s1 = testMethod(s);
+        @StartsWith({"https", "path"}) String s1 = testMethod(s);
     }
 }
