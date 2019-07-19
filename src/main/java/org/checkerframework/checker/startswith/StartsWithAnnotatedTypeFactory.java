@@ -27,13 +27,10 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     // The @StartsWithUnknown annotation
     private final AnnotationMirror UNKNOWN;
 
-    private final ArrayList<String> ACCEPTED_STRINGS;
-
     public StartsWithAnnotatedTypeFactory(BaseTypeChecker checker){
         super(checker);
         this.BOTTOM = AnnotationBuilder.fromClass(this.elements, StartsWithBottom.class);
         this.UNKNOWN = AnnotationBuilder.fromClass(this.elements, StartsWithUnknown.class);
-        this.ACCEPTED_STRINGS = new ArrayList<String> (Arrays.asList("https", "file", "path"));
         this.postInit();
     }
 
@@ -51,12 +48,12 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 
     @Override
     protected Set<Class<? extends Annotation>> createSupportedTypeQualifiers() {
-            return new LinkedHashSet<>(
-                Arrays.asList(
-                        StartsWith.class,
-                        StartsWithBottom.class,
-                        StartsWithUnknown.class,
-                        PolyStartsWith.class));
+        return new LinkedHashSet<>(
+            Arrays.asList(
+                StartsWith.class,
+                StartsWithBottom.class,
+                StartsWithUnknown.class,
+                PolyStartsWith.class));
     }
 
     /**
@@ -72,21 +69,18 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     }
 
     /**
-     * If tree is a literal tree of kind string literal and if the string starts with "https",
-     * "file" or "path" then add the StartsWith annotation so that dataflow can refine it
+     * If tree is a literal tree of kind string literal then add the StartsWith annotation with the string as the
+     * only element in the array so that dataflow can refine it
      * @param tree: Given AST
      * @param type: Type of the tree
      */
     private void setStringToStartsWith(Tree tree, AnnotatedTypeMirror type){
         if(tree.getKind() == Tree.Kind.STRING_LITERAL){
             LiteralTree literalTree = (LiteralTree) tree;
-            for(String s: this.ACCEPTED_STRINGS) {
-                if (literalTree.getValue().toString().startsWith(s)) {
-                    QualifierDefaults defaults = new QualifierDefaults(this.elements, this);
-                    defaults.addCheckedCodeDefault(createStartsWith(this.ACCEPTED_STRINGS), TypeUseLocation.ALL);
-                    defaults.annotate(tree, type);
-                }
-            }
+            QualifierDefaults defaults = new QualifierDefaults(this.elements, this);
+            String s = literalTree.getValue().toString();
+            defaults.addCheckedCodeDefault(createStartsWith(Collections.singleton(s)), TypeUseLocation.ALL);
+            defaults.annotate(tree, type);
         }
     }
 
@@ -95,14 +89,15 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
      * then the tree will have StartsWith annotation
      * @param tree Given AST
      * @param type Type of the tree
-     */
+    */
     private void checkConcatenatedString (Tree tree, AnnotatedTypeMirror type) {
         if (tree.getKind() == Tree.Kind.PLUS){
             BinaryTree binaryTree = (BinaryTree) tree;
             AnnotatedTypeMirror atm = getAnnotatedType(binaryTree.getLeftOperand());
             if(AnnotationUtils.containsSameByClass(atm.getAnnotations(), StartsWith.class)){
                 QualifierDefaults defaults = new QualifierDefaults(this.elements, this);
-                defaults.addCheckedCodeDefault(createStartsWith(this.ACCEPTED_STRINGS), TypeUseLocation.ALL);
+                AnnotationMirror am = AnnotationUtils.getAnnotationByClass(atm.getAnnotations(), StartsWith.class);
+                defaults.addCheckedCodeDefault(am, TypeUseLocation.ALL);
                 defaults.annotate(tree, type);
             }
         }
@@ -180,11 +175,25 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                     && AnnotationUtils.hasElementValue(superAnno, "value")) {
                 List<String> subArrays = AnnotationUtils.getElementValueArray(subAnno, "value", String.class, true);
                 List<String> superArrays = AnnotationUtils.getElementValueArray(superAnno, "value", String.class, true);;
-                if (superArrays.containsAll(subArrays)) {
-                    return true;
-                }
+                return checkStartsWith(subArrays, superArrays);
             }
             return false;
+        }
+
+        private boolean checkStartsWith(List<String> subArrays, List<String> superArrays){
+            for (String s1: subArrays){
+                boolean temp = false;
+                for(String s2: superArrays){
+                    if(s1.startsWith(s2)) {
+                        temp = true;
+                    }
+
+                }
+                if (!temp){
+                    return false;
+                }
+            }
+            return true;
         }
 
         @Override
