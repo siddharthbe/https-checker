@@ -1,20 +1,20 @@
 # StartsWith-checker
 A typechecker for enforcing that APIs start with string constants having specific substrings. An example application
-is URLs where strings start with accepted protocols like "https", "file", "path", etc.
+is URLs where strings start with accepted protocols like "https", "file", "jar:https", and "jar:file".
 For instance, "www.google.com" would get rejected while "https://www.google.com" would get accepted by a type system
-that accepts strings which start with "https".
+that accepts strings which start with "https://".
 The checker has four qualifiers:
 * @StartsWith(String[] acceptedStrings):
         An expression with this type represents a string that starts with the same substring as at least one string from
         acceptedStrings. The annotation takes an array of accepted strings as an argument to type check against.
-        For example, to enforce that all URLs start with "https", "file", and "path":
+        For example, to enforce that all URLs start with "https://", "file://", "jar:https// and "jar:file//":
             `class URL{
-                public URL(@StartsWith({"https", "file", "path"}) String spec);
+                public URL(@StartsWith({"https://", "file://", "jar:https://", "jar:file://"}) String spec);
             }`.
         @StartsWith(String[] acceptedStrings) annotation is the super type of @StartsWithBottom and the subtype of
         @StartsWithUnknown. @StartsWith(a) is a subtype of @StartsWith(b) if all strings in array a start with atleast
         one string from array b.
-        For example, `@StartsWith({"https", "path"})` is a subtype of `@StartsWith({"h", "p"})`.
+        For example, `@StartsWith({"https://", "file://"})` is a subtype of `@StartsWith({"h", "f"})`.
 
 * @PolyStartsWith:
         indicates qualifier polymorphism. For a description of qualifier polymorphism, 
