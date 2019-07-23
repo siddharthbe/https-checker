@@ -10,7 +10,7 @@ class TestTypeHierarchy{
         }
     }
 
-    @StartsWith({"https://", "path://"}) String subtypingBad(@StartsWith({"https://", "file://", "jar:https://",
+    @StartsWith({"https://", "file://"}) String subtypingBad(@StartsWith({"https://", "file://", "jar:https://",
             "jar:file://"}) String s1, @StartsWith({"file://", "http://"}) String s2, boolean condition){
         if(condition){
             // :: error: return.type.incompatible
