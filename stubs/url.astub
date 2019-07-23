@@ -1,7 +1,29 @@
+/**We check for URLs and URIs that are only created using "https" or local protocols like "file", "jar:https", and
+  *"jar:file". More protocols can be accepted by adding strings to the array in the @StartsWith annotation.
+  */
 import org.checkerframework.checker.startswith.qual.*;
 
 package java.net;
 
 class URL{
-    public URL(@StartsWith({"https", "file", "path"}) String spec);
+    public URL(@StartsWith({"https://", "file://", "jar:https://", "jar:file://"}) String spec);
+    public URL(@StartsWith({"https", "file", "jar:https", "jar:file"}) String protocol, String  host, int port,
+               String file);
+    public URL(@StartsWith({"https", "file", "jar:https", "jar:file"}) String protocol, String  host, int port,
+               String file, URLStreamHandler handler);
+    public URL(@StartsWith({"https", "file", "jar:https", "jar:file"}) String protocol, String  host, String file);
+    public URL(URL context, @StartsWith({"https://", "file://", "jar:https://", "jar:file://"}) String spec);
+    public URL(URL context, @StartsWith({"https://", "file://", "jar:https://", "jar:file://"}) String spec,
+               URLStreamHandler handler);
+}
+
+class URI{
+    public URI(@StartsWith({"https://", "file://", "jar:https://", "jar:file://"}) String str);
+    public URI(@StartsWith({"https", "file", "jar:https", "jar:file"}) String scheme, String ssp, String fragment);
+    public URI(@StartsWith({"https", "file", "jar:https", "jar:file"}) String scheme, String host, String path,
+               String fragment);
+    public URI(@StartsWith({"https", "file", "jar:https", "jar:file"}) String scheme, String authority, String path,
+               String query, String fragment);
+    public URI(@StartsWith({"https", "file", "jar:https", "jar:file"}) String scheme, String userInfo,
+               String host, int port, String path, String query, String fragment);
 }
