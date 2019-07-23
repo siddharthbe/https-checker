@@ -1,8 +1,8 @@
 import org.checkerframework.checker.startswith.qual.*;
 
 class TestTypeHierarchy{
-    @StartsWith({"https", "path"}) String subtypingGood(@StartsWith({"https"}) String s1,
-                                                         @StartsWith({"path"}) String s2, boolean condition ){
+    @StartsWith({"https://", "file://"}) String subtypingGood(@StartsWith({"https://"}) String s1,
+                                                         @StartsWith({"file://"}) String s2, boolean condition ){
         if(condition){
             return s1;
         }else{
@@ -10,8 +10,8 @@ class TestTypeHierarchy{
         }
     }
 
-    @StartsWith({"https", "path"}) String subtypingBad(@StartsWith({"https", "file", "path"}) String s1,
-                                                                 @StartsWith({"path", "http"}) String s2, boolean condition){
+    @StartsWith({"https://", "path://"}) String subtypingBad(@StartsWith({"https://", "file://", "jar:https://",
+            "jar:file://"}) String s1, @StartsWith({"file://", "http://"}) String s2, boolean condition){
         if(condition){
             // :: error: return.type.incompatible
             return s1;
@@ -24,32 +24,32 @@ class TestTypeHierarchy{
     void testLeastUpperBoundGood(boolean condition){
         String s1;
         if(condition){
-            s1 = "https";
+            s1 = "https://";
         }else{
-            s1 = "file";
+            s1 = "file://";
         }
-        @StartsWith({"https", "file"}) String s2 = s1;
+        @StartsWith({"https://", "file://"}) String s2 = s1;
     }
 
     void testLeastBoundBad(boolean condition){
         String s1;
         if(condition){
-            s1 = "http";
+            s1 = "http://";
         }else{
-            s1 = "path";
+            s1 = "file://";
         }
         // :: error: assignment.type.incompatible
-        @StartsWith({"https", "file"}) String s2 = s1;
+        @StartsWith({"https://", "file://"}) String s2 = s1;
     }
 
     void testLeastBoundBad2(boolean condition){
         String s1;
         if(condition){
-            s1 = "https";
+            s1 = "https://";
         }else{
-            s1 = "path";
+            s1 = "files://";
         }
         // :: error: assignment.type.incompatible
-        @StartsWith({"https", "file"}) String s2 = s1;
+        @StartsWith({"https://", "file://"}) String s2 = s1;
     }
 }

@@ -9,8 +9,8 @@ class PolyTest {
         return s;
     }
 
-    void makesUrl(@StartsWith({"https", "path"}) String s) {
-        @StartsWith({"https", "path"}) String s1 = testMethod(s);
+    void makesUrl(@StartsWith({"https://", "file://"}) String s) {
+        @StartsWith({"https://", "file://"}) String s1 = testMethod(s);
     }
 
     void doesntMakeUrl(String s) {
@@ -19,6 +19,6 @@ class PolyTest {
 
     void testError(String s) {
         // :: error: assignment.type.incompatible
-        @StartsWith({"https", "path"}) String s1 = testMethod(s);
+        @StartsWith({"https://", "file://"}) String s1 = testMethod(s);
     }
 }
