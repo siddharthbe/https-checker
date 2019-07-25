@@ -15,11 +15,18 @@ import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.javacutil.TreeUtils;
 import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.dataflow.cfg.node.MethodInvocationNode;
+import org.checkerframework.dataflow.cfg.node.Node;
+import org.checkerframework.dataflow.cfg.node.ConditionalAndNode;
+import org.checkerframework.dataflow.analysis.ConditionalTransferResult;
+import org.checkerframework.dataflow.analysis.RegularTransferResult;
+import org.checkerframework.dataflow.analysis.TransferInput;
+import org.checkerframework.dataflow.analysis.TransferResult;
+import org.checkerframework.dataflow.analysis.TransferFunction;
 import org.checkerframework.dataflow.analysis.FlowExpressions;
 import org.checkerframework.dataflow.analysis.FlowExpressions.Receiver;
-import org.checkerframework.dataflow.cfg.node.Node;
-import org.checkerframework.checker.startswith.qual.StartsWith;
+import org.checkerframework.checker.startswith.qual.StartsWithUnknown;
 import com.sun.source.tree.Tree;
+
 
 public class StartsWithTransfer extends CFTransfer{
 
@@ -45,8 +52,37 @@ public class StartsWithTransfer extends CFTransfer{
         Receiver receiverReceiver = FlowExpressions.internalReprOf(aTypeFactory, receiver);
         if (methodElement.equals(stringStartsWith)) {
             AnnotatedTypeMirror atm = aTypeFactory.getAnnotatedType(node.getArgument(0).getTree());
-            thenStore.insertValue(receiverReceiver, AnnotationUtils.getAnnotationByClass(atm.getAnnotations(),
-                                                                                         StartsWith.class));
+            thenStore.insertValue(receiverReceiver,
+                                  atm.getAnnotationInHierarchy(aTypeFactory.getUNKNOWN()));
         }
+    }
+
+    /**For all then branches which have a (startsWith && startsWith) condition with the same receievers it annotates the
+     * receiver with the GLB of the annotations of the arguments of startsWith
+     */
+    @Override
+    public TransferResult<CFValue, CFStore> visitConditionalAnd(ConditionalAndNode node,
+                                                                TransferInput<CFValue, CFStore> input){
+        TransferResult<CFValue, CFStore> result = super.visitConditionalAnd(node, input);
+        if(node.getLeftOperand().getTree().getKind() == Tree.Kind.METHOD_INVOCATION &&
+                node.getLeftOperand().getTree().getKind() == Tree.Kind.METHOD_INVOCATION){
+            MethodInvocationNode lft = (MethodInvocationNode) node.getLeftOperand();
+            MethodInvocationNode rht = (MethodInvocationNode) node.getRightOperand();
+            if(lft.getTarget().getReceiver().equals(rht.getTarget().getReceiver())) {
+                ExecutableElement methodElementlft = lft.getTarget().getMethod();
+                ExecutableElement methodElementrht = rht.getTarget().getMethod();
+                if (methodElementlft.equals(stringStartsWith) && methodElementrht.equals(stringStartsWith)) {
+                    Node receiver = lft.getTarget().getReceiver();
+                    Receiver receiverReceiver = FlowExpressions.internalReprOf(aTypeFactory, receiver);
+                    AnnotatedTypeMirror atmLft = aTypeFactory.getAnnotatedType(lft.getArgument(0).getTree());
+                    AnnotatedTypeMirror atmRht = aTypeFactory.getAnnotatedType(rht.getArgument(0).getTree());
+                    AnnotationMirror finalType = aTypeFactory.getQualifierHierarchy().greatestLowerBound(
+                            atmLft.getAnnotationInHierarchy(aTypeFactory.getUNKNOWN()),
+                            atmRht.getAnnotationInHierarchy(aTypeFactory.getUNKNOWN()));
+                    result.getThenStore().insertValue(receiverReceiver, finalType);
+                }
+            }
+        }
+        return result;
     }
 }

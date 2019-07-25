@@ -103,6 +103,10 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         }
     }
 
+    public AnnotationMirror getUNKNOWN() {
+        return UNKNOWN;
+    }
+
     /** The qualifier hierarchy for the StartsWith type system. StartsWithUnknown is the topmost type and is the default
      * type. StartsWithBottom is the bottom most type in the heirarchy. Types like StartsWith({"a"}) and
      * StartsWith({"b"}) are distinct and at the same level.
