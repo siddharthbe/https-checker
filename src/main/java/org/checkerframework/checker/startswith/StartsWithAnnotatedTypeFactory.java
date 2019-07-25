@@ -103,6 +103,9 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         }
     }
 
+    /**Returns a copy of the top annotation for access of the type heirarchy. The method is package-private so that
+     * can only be called by users within the package.
+     */
     AnnotationMirror getCanonicalTopAnnotation() {
         return this.UNKNOWN;
     }

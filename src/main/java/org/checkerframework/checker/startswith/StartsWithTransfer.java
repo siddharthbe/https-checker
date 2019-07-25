@@ -17,6 +17,7 @@ import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.dataflow.cfg.node.MethodInvocationNode;
 import org.checkerframework.dataflow.cfg.node.Node;
 import org.checkerframework.dataflow.cfg.node.ConditionalAndNode;
+import org.checkerframework.dataflow.cfg.node.MethodAccessNode;
 import org.checkerframework.dataflow.analysis.ConditionalTransferResult;
 import org.checkerframework.dataflow.analysis.RegularTransferResult;
 import org.checkerframework.dataflow.analysis.TransferInput;
@@ -64,21 +65,26 @@ public class StartsWithTransfer extends CFTransfer{
     public TransferResult<CFValue, CFStore> visitConditionalAnd(ConditionalAndNode node,
                                                                 TransferInput<CFValue, CFStore> input){
         TransferResult<CFValue, CFStore> result = super.visitConditionalAnd(node, input);
-        if(node.getLeftOperand().getTree().getKind() == Tree.Kind.METHOD_INVOCATION &&
-                node.getRightOperand().getTree().getKind() == Tree.Kind.METHOD_INVOCATION){
-            MethodInvocationNode leftNode = (MethodInvocationNode) node.getLeftOperand();
-            MethodInvocationNode rightNode = (MethodInvocationNode) node.getRightOperand();
-            if(leftNode.getTarget().getReceiver().equals(rightNode.getTarget().getReceiver())) {
-                ExecutableElement methodElementLeft = leftNode.getTarget().getMethod();
-                ExecutableElement methodElementRight = rightNode.getTarget().getMethod();
+        Node leftOperand = node.getLeftOperand();
+        Node rightOperand = node.getRightOperand();
+        if(leftOperand.getTree().getKind() == Tree.Kind.METHOD_INVOCATION &&
+                rightOperand.getTree().getKind() == Tree.Kind.METHOD_INVOCATION){
+            MethodInvocationNode leftNode = (MethodInvocationNode) leftOperand;
+            MethodInvocationNode rightNode = (MethodInvocationNode) rightOperand;
+            MethodAccessNode leftTarget = leftNode.getTarget();
+            MethodAccessNode rightTarget = rightNode.getTarget();
+            Node leftReceiver = leftTarget.getReceiver();
+            if(leftReceiver.equals(rightTarget.getReceiver())) {
+                ExecutableElement methodElementLeft = leftTarget.getMethod();
+                ExecutableElement methodElementRight = rightTarget.getMethod();
                 if (methodElementLeft.equals(stringStartsWith) && methodElementRight.equals(stringStartsWith)) {
-                    Node receiver = leftNode.getTarget().getReceiver();
-                    Receiver receiverReceiver = FlowExpressions.internalReprOf(aTypeFactory, receiver);
+                    Receiver receiverReceiver = FlowExpressions.internalReprOf(aTypeFactory, leftReceiver);
                     AnnotatedTypeMirror atmLeft = aTypeFactory.getAnnotatedType(leftNode.getArgument(0).getTree());
                     AnnotatedTypeMirror atmRight = aTypeFactory.getAnnotatedType(rightNode.getArgument(0).getTree());
+                    AnnotationMirror canonicalTopAnnotation = aTypeFactory.getCanonicalTopAnnotation();
                     AnnotationMirror finalType = aTypeFactory.getQualifierHierarchy().greatestLowerBound(
-                            atmLeft.getAnnotationInHierarchy(aTypeFactory.getCanonicalTopAnnotation()),
-                            atmRight.getAnnotationInHierarchy(aTypeFactory.getCanonicalTopAnnotation()));
+                            atmLeft.getAnnotationInHierarchy(canonicalTopAnnotation),
+                            atmRight.getAnnotationInHierarchy(canonicalTopAnnotation));
                     result.getThenStore().insertValue(receiverReceiver, finalType);
                 }
             }
