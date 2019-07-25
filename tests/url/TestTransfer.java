@@ -72,8 +72,14 @@ class TestTransfer{
         }
     }
 
-    void checkAndTwoReceivers(String s) throws MalformedURLException{
+    void checkAndOneReceiver(String s) throws MalformedURLException{
         if(s.startsWith("https://") && s.startsWith("http")){
+            URL url = new URL(s);
+        }
+    }
+
+    void checkMethodInvocationRightOperandFail(String s) throws MalformedURLException{
+        if(s.startsWith("https://") && true){
             URL url = new URL(s);
         }
     }

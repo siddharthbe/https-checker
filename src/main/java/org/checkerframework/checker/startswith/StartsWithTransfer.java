@@ -53,11 +53,11 @@ public class StartsWithTransfer extends CFTransfer{
         if (methodElement.equals(stringStartsWith)) {
             AnnotatedTypeMirror atm = aTypeFactory.getAnnotatedType(node.getArgument(0).getTree());
             thenStore.insertValue(receiverReceiver,
-                                  atm.getAnnotationInHierarchy(aTypeFactory.getUNKNOWN()));
+                                  atm.getAnnotationInHierarchy(aTypeFactory.getCanonicalTopAnnotation()));
         }
     }
 
-    /**For all then branches which have a (startsWith && startsWith) condition with the same receievers it annotates the
+    /**For all then branches which have a (startsWith && startsWith) condition with the same receivers it annotates the
      * receiver with the GLB of the annotations of the arguments of startsWith
      */
     @Override
@@ -65,20 +65,20 @@ public class StartsWithTransfer extends CFTransfer{
                                                                 TransferInput<CFValue, CFStore> input){
         TransferResult<CFValue, CFStore> result = super.visitConditionalAnd(node, input);
         if(node.getLeftOperand().getTree().getKind() == Tree.Kind.METHOD_INVOCATION &&
-                node.getLeftOperand().getTree().getKind() == Tree.Kind.METHOD_INVOCATION){
-            MethodInvocationNode lft = (MethodInvocationNode) node.getLeftOperand();
-            MethodInvocationNode rht = (MethodInvocationNode) node.getRightOperand();
-            if(lft.getTarget().getReceiver().equals(rht.getTarget().getReceiver())) {
-                ExecutableElement methodElementlft = lft.getTarget().getMethod();
-                ExecutableElement methodElementrht = rht.getTarget().getMethod();
-                if (methodElementlft.equals(stringStartsWith) && methodElementrht.equals(stringStartsWith)) {
-                    Node receiver = lft.getTarget().getReceiver();
+                node.getRightOperand().getTree().getKind() == Tree.Kind.METHOD_INVOCATION){
+            MethodInvocationNode leftNode = (MethodInvocationNode) node.getLeftOperand();
+            MethodInvocationNode rightNode = (MethodInvocationNode) node.getRightOperand();
+            if(leftNode.getTarget().getReceiver().equals(rightNode.getTarget().getReceiver())) {
+                ExecutableElement methodElementLeft = leftNode.getTarget().getMethod();
+                ExecutableElement methodElementRight = rightNode.getTarget().getMethod();
+                if (methodElementLeft.equals(stringStartsWith) && methodElementRight.equals(stringStartsWith)) {
+                    Node receiver = leftNode.getTarget().getReceiver();
                     Receiver receiverReceiver = FlowExpressions.internalReprOf(aTypeFactory, receiver);
-                    AnnotatedTypeMirror atmLft = aTypeFactory.getAnnotatedType(lft.getArgument(0).getTree());
-                    AnnotatedTypeMirror atmRht = aTypeFactory.getAnnotatedType(rht.getArgument(0).getTree());
+                    AnnotatedTypeMirror atmLeft = aTypeFactory.getAnnotatedType(leftNode.getArgument(0).getTree());
+                    AnnotatedTypeMirror atmRight = aTypeFactory.getAnnotatedType(rightNode.getArgument(0).getTree());
                     AnnotationMirror finalType = aTypeFactory.getQualifierHierarchy().greatestLowerBound(
-                            atmLft.getAnnotationInHierarchy(aTypeFactory.getUNKNOWN()),
-                            atmRht.getAnnotationInHierarchy(aTypeFactory.getUNKNOWN()));
+                            atmLeft.getAnnotationInHierarchy(aTypeFactory.getCanonicalTopAnnotation()),
+                            atmRight.getAnnotationInHierarchy(aTypeFactory.getCanonicalTopAnnotation()));
                     result.getThenStore().insertValue(receiverReceiver, finalType);
                 }
             }

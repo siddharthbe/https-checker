@@ -103,8 +103,8 @@ public class StartsWithAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         }
     }
 
-    public AnnotationMirror getUNKNOWN() {
-        return UNKNOWN;
+    AnnotationMirror getCanonicalTopAnnotation() {
+        return this.UNKNOWN;
     }
 
     /** The qualifier hierarchy for the StartsWith type system. StartsWithUnknown is the topmost type and is the default
