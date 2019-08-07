@@ -1,5 +1,6 @@
 import java.net.URL;
 import java.net.MalformedURLException;
+import org.checkerframework.checker.startswith.qual.*;
 
 class BasicURLTest {
     void good() throws MalformedURLException {
